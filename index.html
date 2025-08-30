@@ -27,10 +27,10 @@
         <div class="game-area">
             <!-- Анимированная карточка -->
             <div class="card-container" id="cardContainer">
-                <div class="card" id="gameCard">
+                <div class="card" id="gameCard" onclick="playCardAudio()">
                     <div class="card-content">
                         <img id="cardImage" src="" alt="" class="card-image">
-                        <button class="audio-btn" id="audioBtn" onclick="playCardAudio()">
+                        <button class="audio-btn" id="audioBtn" onclick="event.stopPropagation(); playCardAudio()">
                             <span class="speaker-icon">🔊</span>
                         </button>
                         <div class="golden-glow" id="goldenGlow"></div>
@@ -72,10 +72,7 @@
             <div class="celebration" id="celebration">🎉</div>
         </div>
 
-        <!-- Следующая карточка -->
-        <div class="next-card-btn" id="nextCardBtn" onclick="nextCard()" style="display: none;">
-            <span>Следующая карточка ➡️</span>
-        </div>
+
     </div>
 
     <script src="src/scripts/main.js"></script>

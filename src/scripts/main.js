@@ -93,7 +93,6 @@ const scoreElement = document.getElementById('score');
 const goldenGlow = document.getElementById('goldenGlow');
 const confetti = document.getElementById('confetti');
 const celebration = document.getElementById('celebration');
-const nextCardBtn = document.getElementById('nextCardBtn');
 const gameCard = document.getElementById('gameCard');
 const wordBtn = document.getElementById('wordBtn');
 const sentenceBtn = document.getElementById('sentenceBtn');
@@ -141,7 +140,6 @@ function showCurrentCard() {
     // Сбрасываем состояние
     gameState = 'waiting';
     goldenGlow.classList.remove('active');
-    nextCardBtn.style.display = 'none';
     
     // Активируем кнопки
     wordBtn.disabled = false;
@@ -292,7 +290,7 @@ function handleCorrectAnswer() {
     // Анимация праздника
     showCelebration();
     
-    // Звук успеха
+    // Звук успеха "Ajoyib zo'r!"
     playSuccessSound();
     
     // Вибрация (если поддерживается)
@@ -300,10 +298,10 @@ function handleCorrectAnswer() {
         navigator.vibrate([100, 50, 100]);
     }
     
-    // Показываем кнопку следующей карточки через 2 секунды
+    // Автоматически переходим к следующей карточке через 2.5 секунды
     setTimeout(() => {
-        nextCardBtn.style.display = 'block';
-    }, 2000);
+        nextCard();
+    }, 2500);
 }
 
 // Обработка неправильного ответа
@@ -328,16 +326,16 @@ function handleIncorrectAnswer(userAnswer) {
         navigator.vibrate(200);
     }
     
-    // Повторяем аудио правильного ответа
+    // Повторяем аудио правильного ответа через 1 секунду
     setTimeout(() => {
         playCardAudio();
     }, 1000);
     
-    // Через 3 секунды возвращаем обычный вид и показываем следующую карточку
+    // Автоматически переходим к следующей карточке через 4 секунды
     setTimeout(() => {
         resetButtonStyles();
-        nextCardBtn.style.display = 'block';
-    }, 3000);
+        nextCard();
+    }, 4000);
 }
 
 // Сброс стилей кнопок
@@ -478,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Звуковые эффекты
 function playSuccessSound() {
     if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance('Ajoyib! Sog!');
+        const utterance = new SpeechSynthesisUtterance('Ajoyib zor!');
         utterance.lang = 'uz-UZ';
         utterance.rate = 1.0;
         utterance.pitch = 1.3;
