@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>So'z va Gap - O'yini</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Счетчик звездочек -->
+        <div class="score-container">
+            <div class="stars" id="stars">
+                ⭐ <span id="score">0</span>
+            </div>
+        </div>
+
+        <!-- Основная область игры -->
+        <div class="game-area">
+            <!-- Анимированная карточка -->
+            <div class="card-container" id="cardContainer">
+                <div class="card" id="gameCard">
+                    <div class="card-content">
+                        <img id="cardImage" src="" alt="" class="card-image">
+                        <div class="golden-glow" id="goldenGlow"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки ответов -->
+            <div class="buttons-container">
+                <button class="answer-btn word-btn" id="wordBtn" onclick="selectAnswer('word')">
+                    <div class="btn-icon">
+                        <svg width="50" height="50" viewBox="0 0 60 60" fill="none">
+                            <circle cx="30" cy="30" r="28" fill="#FFFFFF" stroke="#4CAF50" stroke-width="4"/>
+                            <circle cx="30" cy="30" r="15" fill="#4CAF50"/>
+                            <text x="30" y="37" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+                        </svg>
+                    </div>
+                    <span class="btn-text">SO'Z</span>
+                </button>
+
+                <button class="answer-btn sentence-btn" id="sentenceBtn" onclick="selectAnswer('sentence')">
+                    <div class="btn-icon">
+                        <svg width="80" height="40" viewBox="0 0 80 40" fill="none">
+                            <rect x="5" y="15" width="15" height="10" rx="5" fill="#FF6B6B"/>
+                            <rect x="25" y="15" width="15" height="10" rx="5" fill="#4ECDC4"/>
+                            <rect x="45" y="15" width="15" height="10" rx="5" fill="#45B7D1"/>
+                            <line x1="20" y1="20" x2="25" y2="20" stroke="#333" stroke-width="2"/>
+                            <line x1="40" y1="20" x2="45" y2="20" stroke="#333" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <span class="btn-text">GAP</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Эффекты -->
+        <div class="effects-container">
+            <div class="confetti" id="confetti"></div>
+            <div class="celebration" id="celebration">🎉</div>
+        </div>
+
+        <!-- Следующая карточка -->
+        <div class="next-card-btn" id="nextCardBtn" onclick="nextCard()" style="display: none;">
+            <span>Следующая карточка ➡️</span>
+        </div>
+    </div>
+
+    <script src="src/scripts/main.js"></script>
+</body>
+</html>

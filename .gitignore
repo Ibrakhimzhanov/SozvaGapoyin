@@ -1,0 +1,15 @@
+# Логи supervisor
+supervisord.log
+supervisord.pid
+webserver.log
+webserver_error.log
+supervisor.sock
+
+# Временные файлы
+*.tmp
+*.log
+*.pid
+
+# Кэш
+__pycache__/
+*.pyc
