@@ -125,6 +125,29 @@ body {
     transform: scale(0.97);
 }
 
+/* Индикация кликабельности */
+.card::after {
+    content: '👆 Нажмите для произношения';
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.card:hover::after {
+    opacity: 1;
+}
+
 .card-content {
     position: relative;
     width: 100%;
@@ -367,6 +390,12 @@ body {
     .card {
         padding: 20px;
         max-width: 250px;
+    }
+    
+    .card::after {
+        content: '👆';
+        font-size: 10px;
+        padding: 3px 6px;
     }
     
     .audio-btn {

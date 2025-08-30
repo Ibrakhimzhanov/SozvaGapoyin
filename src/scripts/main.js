@@ -164,96 +164,104 @@ function showCurrentCard() {
 }
 
 // Воспроизведение аудио для текущей карточки
-async function playCardAudio() {
-    if (isAudioLoading || currentCardIndex >= gameCards.length) return;
+function playCardAudio() {
+    if (isAudioLoading || currentCardIndex >= gameCards.length) {
+        console.log('Аудио уже проигрывается или нет карточек');
+        return;
+    }
     
     const currentCard = gameCards[currentCardIndex];
+    console.log('Воспроизведение аудио для:', currentCard.audioText);
     
     try {
         isAudioLoading = true;
         audioBtn.classList.add('playing');
         
         // Останавливаем предыдущее аудио
-        if (currentAudio) {
-            currentAudio.pause();
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
         }
         
-        // Генерируем аудио через TTS API
-        const audioUrl = await generateTTS(currentCard.audioText);
-        
-        if (audioUrl) {
-            currentAudio = new Audio(audioUrl);
+        // Используем Web Speech API напрямую
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(currentCard.audioText);
             
-            currentAudio.onended = () => {
+            // Настройки для узбекского языка
+            utterance.lang = 'uz-UZ';
+            utterance.rate = 0.8; // Медленная речь для детей
+            utterance.pitch = 1.1;
+            utterance.volume = 1.0;
+            
+            // Попробуем найти подходящий голос
+            const voices = speechSynthesis.getVoices();
+            console.log('Доступные голоса:', voices.map(v => `${v.name} (${v.lang})`));
+            
+            const uzbekVoice = voices.find(voice => 
+                voice.lang.includes('uz') || 
+                voice.lang.includes('tr') || 
+                voice.name.toLowerCase().includes('uzbek') ||
+                voice.name.toLowerCase().includes('turkish')
+            );
+            
+            if (uzbekVoice) {
+                utterance.voice = uzbekVoice;
+                console.log('Используем голос:', uzbekVoice.name);
+            } else {
+                console.log('Используем голос по умолчанию');
+            }
+            
+            utterance.onstart = () => {
+                console.log('Аудио начато');
+            };
+            
+            utterance.onend = () => {
+                console.log('Аудио завершено');
                 audioBtn.classList.remove('playing');
                 isAudioLoading = false;
             };
             
-            currentAudio.onerror = () => {
-                console.log('Ошибка воспроизведения аудио');
-                audioBtn.classList.remove('playing');
-                isAudioLoading = false;
+            utterance.onerror = (event) => {
+                console.log('Ошибка аудио:', event.error);
+                // Если ошибка synthesis-failed, попробуем еще раз с английским голосом
+                if (event.error === 'synthesis-failed') {
+                    console.log('Пробуем с английским голосом');
+                    const englishUtterance = new SpeechSynthesisUtterance(currentCard.audioText);
+                    englishUtterance.lang = 'en-US';
+                    englishUtterance.rate = 0.8;
+                    englishUtterance.pitch = 1.1;
+                    
+                    englishUtterance.onend = () => {
+                        audioBtn.classList.remove('playing');
+                        isAudioLoading = false;
+                    };
+                    
+                    englishUtterance.onerror = () => {
+                        audioBtn.classList.remove('playing');
+                        isAudioLoading = false;
+                    };
+                    
+                    speechSynthesis.speak(englishUtterance);
+                } else {
+                    audioBtn.classList.remove('playing');
+                    isAudioLoading = false;
+                }
             };
             
-            currentAudio.play().catch(error => {
-                console.log('Ошибка запуска аудио:', error);
-                audioBtn.classList.remove('playing');
-                isAudioLoading = false;
-            });
+            speechSynthesis.speak(utterance);
+        } else {
+            console.log('Speech Synthesis не поддерживается');
+            audioBtn.classList.remove('playing');
+            isAudioLoading = false;
         }
         
     } catch (error) {
-        console.log('Ошибка генерации аудио:', error);
+        console.log('Ошибка воспроизведения:', error);
         audioBtn.classList.remove('playing');
         isAudioLoading = false;
     }
 }
 
-// Генерация TTS аудио
-async function generateTTS(text) {
-    try {
-        // Используем Web Speech API для узбекского языка (если доступно)
-        if ('speechSynthesis' in window) {
-            return new Promise((resolve) => {
-                const utterance = new SpeechSynthesisUtterance(text);
-                
-                // Настройки для узбекского языка
-                utterance.lang = 'uz-UZ'; // Узбекский язык
-                utterance.rate = 0.8; // Медленная речь для детей
-                utterance.pitch = 1.2; // Высокий тон
-                utterance.volume = 1.0;
-                
-                // Попробуем найти подходящий голос
-                const voices = speechSynthesis.getVoices();
-                const uzbekVoice = voices.find(voice => 
-                    voice.lang.includes('uz') || 
-                    voice.lang.includes('tr') || // Турецкий как близкий к узбекскому
-                    voice.name.toLowerCase().includes('uzbek')
-                );
-                
-                if (uzbekVoice) {
-                    utterance.voice = uzbekVoice;
-                }
-                
-                utterance.onstart = () => {
-                    resolve(true);
-                };
-                
-                utterance.onerror = () => {
-                    resolve(false);
-                };
-                
-                speechSynthesis.speak(utterance);
-            });
-        }
-        
-        return false;
-        
-    } catch (error) {
-        console.log('Ошибка TTS:', error);
-        return false;
-    }
-}
+
 
 // Обработка выбора ответа
 function selectAnswer(userAnswer) {
@@ -348,7 +356,14 @@ function resetButtonStyles() {
 
 // Переход к следующей карточке
 function nextCard() {
-    nextCardBtn.style.display = 'none';
+    console.log('Переход к следующей карточке');
+    
+    // Останавливаем любое аудио
+    if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+    }
+    isAudioLoading = false;
+    audioBtn.classList.remove('playing');
     
     // Анимация исчезновения
     gameCard.classList.add('slide-out');
@@ -459,23 +474,55 @@ function initVoices() {
         const loadVoices = () => {
             const voices = speechSynthesis.getVoices();
             console.log('Доступные голоса:', voices.map(v => `${v.name} (${v.lang})`));
+            
+            // Если голосов нет, используем резервный подход
+            if (voices.length === 0) {
+                console.log('Голоса еще не загружены, будем использовать голос по умолчанию');
+            }
         };
         
         speechSynthesis.onvoiceschanged = loadVoices;
         loadVoices(); // Загружаем сразу, если уже доступны
+        
+        // Дополнительная попытка через секунду
+        setTimeout(loadVoices, 1000);
     }
+}
+
+// Добавляем обработчики событий
+function addEventListeners() {
+    // Обработчик клика на карточку
+    gameCard.addEventListener('click', function(event) {
+        console.log('Клик на карточку');
+        // Если клик был не по кнопке аудио
+        if (!event.target.closest('.audio-btn')) {
+            playCardAudio();
+        }
+    });
+    
+    // Обработчик клика на кнопку аудио
+    audioBtn.addEventListener('click', function(event) {
+        console.log('Клик на кнопку аудио');
+        event.stopPropagation(); // Останавливаем всплытие события
+        playCardAudio();
+    });
 }
 
 // Запуск игры
 document.addEventListener('DOMContentLoaded', function() {
     initVoices();
     preloadImages();
+    addEventListeners();
     initGame();
 });
 
 // Звуковые эффекты
 function playSuccessSound() {
+    console.log('Воспроизведение звука успеха');
     if ('speechSynthesis' in window) {
+        // Останавливаем предыдущую речь
+        speechSynthesis.cancel();
+        
         const utterance = new SpeechSynthesisUtterance('Ajoyib zor!');
         utterance.lang = 'uz-UZ';
         utterance.rate = 1.0;
@@ -485,7 +532,8 @@ function playSuccessSound() {
         const voices = speechSynthesis.getVoices();
         const uzbekVoice = voices.find(voice => 
             voice.lang.includes('uz') || 
-            voice.lang.includes('tr')
+            voice.lang.includes('tr') ||
+            voice.name.toLowerCase().includes('turkish')
         );
         
         if (uzbekVoice) {
@@ -497,6 +545,7 @@ function playSuccessSound() {
 }
 
 function playErrorSound() {
+    console.log('Воспроизведение звука ошибки');
     if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance('Qaytadan urinib koring');
         utterance.lang = 'uz-UZ';
@@ -507,7 +556,8 @@ function playErrorSound() {
         const voices = speechSynthesis.getVoices();
         const uzbekVoice = voices.find(voice => 
             voice.lang.includes('uz') || 
-            voice.lang.includes('tr')
+            voice.lang.includes('tr') ||
+            voice.name.toLowerCase().includes('turkish')
         );
         
         if (uzbekVoice) {
