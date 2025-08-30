@@ -1,62 +1,84 @@
-// Игровые данные с использованием предоставленных изображений
+// Игровые данные с аудио на узбекском языке
 const gameCards = [
     // Картинки отдельных предметов - SO'Z (слова)
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/cff9786b5c55b3e2279ca47565526131', // Мяч
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "To'p",
+        audioText: "To'p"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/307839f3489e6d96919b4fae2911da3f', // Яблоко
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Olma",
+        audioText: "Olma"
     },
     {
         type: 'word', 
         image: 'https://page.gensparksite.com/v1/base64_upload/34e8ed89d550725f30d5c0a7ab3d8e5f', // Солнце
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Quyosh",
+        audioText: "Quyosh"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/6b3d748cd990f844fd4f468aecdf9668', // Птичка
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Qush",
+        audioText: "Qush"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/219d0f515902aefd611dbc2c75152b05', // Цветок
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Gul",
+        audioText: "Gul"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/1b933396c15d8e3aec7936ad9c0107b4', // Котенок у дома
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Mushuk",
+        audioText: "Mushuk"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/1fdba870473c00a08374ba0233fdfa42', // Котенок на траве
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Mushuk",
+        audioText: "Mushuk"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/9047c0869a33e9cb12ee2583f8cdbe82', // Дом
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Uy",
+        audioText: "Uy"
     },
     
     // Сценки и действия - GAP (предложения)
     {
         type: 'sentence',
         image: 'https://page.gensparksite.com/v1/base64_upload/150b51571fcec876fe4ad8a152f3ef03', // Ребенок спит с мишкой
-        correctAnswer: 'sentence'
+        correctAnswer: 'sentence',
+        uzbekText: "Bola uxlaydi",
+        audioText: "Bola uxlaydi"
     },
     {
         type: 'sentence', 
         image: 'https://page.gensparksite.com/v1/base64_upload/544343a0091c6f8bb1c004009018fbc2', // Девочка поет
-        correctAnswer: 'sentence'
+        correctAnswer: 'sentence',
+        uzbekText: "Qiz kuylaydi",
+        audioText: "Qiz kuylaydi"
     },
     {
         type: 'sentence',
         image: 'https://page.gensparksite.com/v1/base64_upload/23bf49411dde75908263605dd6a1c47d', // Медведь ест яблоко
-        correctAnswer: 'sentence'
+        correctAnswer: 'sentence',
+        uzbekText: "Ayiq olma yeydi",
+        audioText: "Ayiq olma yeydi"
     }
 ];
 
@@ -75,6 +97,11 @@ const nextCardBtn = document.getElementById('nextCardBtn');
 const gameCard = document.getElementById('gameCard');
 const wordBtn = document.getElementById('wordBtn');
 const sentenceBtn = document.getElementById('sentenceBtn');
+const audioBtn = document.getElementById('audioBtn');
+
+// Аудио система
+let currentAudio = null;
+let isAudioLoading = false;
 
 // Инициализация игры
 function initGame() {
@@ -109,7 +136,7 @@ function showCurrentCard() {
     
     // Загружаем изображение
     cardImage.src = currentCard.image;
-    cardImage.alt = `Карточка ${currentCardIndex + 1}`;
+    cardImage.alt = currentCard.uzbekText;
     
     // Сбрасываем состояние
     gameState = 'waiting';
@@ -122,10 +149,112 @@ function showCurrentCard() {
     wordBtn.style.opacity = '1';
     sentenceBtn.style.opacity = '1';
     
+    // Останавливаем предыдущее аудио
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    
     // Убираем анимацию через время
     setTimeout(() => {
         gameCard.classList.remove('slide-in');
+        // Автоматически воспроизводим аудио через 1 секунду
+        setTimeout(() => {
+            playCardAudio();
+        }, 1000);
     }, 800);
+}
+
+// Воспроизведение аудио для текущей карточки
+async function playCardAudio() {
+    if (isAudioLoading || currentCardIndex >= gameCards.length) return;
+    
+    const currentCard = gameCards[currentCardIndex];
+    
+    try {
+        isAudioLoading = true;
+        audioBtn.classList.add('playing');
+        
+        // Останавливаем предыдущее аудио
+        if (currentAudio) {
+            currentAudio.pause();
+        }
+        
+        // Генерируем аудио через TTS API
+        const audioUrl = await generateTTS(currentCard.audioText);
+        
+        if (audioUrl) {
+            currentAudio = new Audio(audioUrl);
+            
+            currentAudio.onended = () => {
+                audioBtn.classList.remove('playing');
+                isAudioLoading = false;
+            };
+            
+            currentAudio.onerror = () => {
+                console.log('Ошибка воспроизведения аудио');
+                audioBtn.classList.remove('playing');
+                isAudioLoading = false;
+            };
+            
+            currentAudio.play().catch(error => {
+                console.log('Ошибка запуска аудио:', error);
+                audioBtn.classList.remove('playing');
+                isAudioLoading = false;
+            });
+        }
+        
+    } catch (error) {
+        console.log('Ошибка генерации аудио:', error);
+        audioBtn.classList.remove('playing');
+        isAudioLoading = false;
+    }
+}
+
+// Генерация TTS аудио
+async function generateTTS(text) {
+    try {
+        // Используем Web Speech API для узбекского языка (если доступно)
+        if ('speechSynthesis' in window) {
+            return new Promise((resolve) => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Настройки для узбекского языка
+                utterance.lang = 'uz-UZ'; // Узбекский язык
+                utterance.rate = 0.8; // Медленная речь для детей
+                utterance.pitch = 1.2; // Высокий тон
+                utterance.volume = 1.0;
+                
+                // Попробуем найти подходящий голос
+                const voices = speechSynthesis.getVoices();
+                const uzbekVoice = voices.find(voice => 
+                    voice.lang.includes('uz') || 
+                    voice.lang.includes('tr') || // Турецкий как близкий к узбекскому
+                    voice.name.toLowerCase().includes('uzbek')
+                );
+                
+                if (uzbekVoice) {
+                    utterance.voice = uzbekVoice;
+                }
+                
+                utterance.onstart = () => {
+                    resolve(true);
+                };
+                
+                utterance.onerror = () => {
+                    resolve(false);
+                };
+                
+                speechSynthesis.speak(utterance);
+            });
+        }
+        
+        return false;
+        
+    } catch (error) {
+        console.log('Ошибка TTS:', error);
+        return false;
+    }
 }
 
 // Обработка выбора ответа
@@ -163,6 +292,9 @@ function handleCorrectAnswer() {
     // Анимация праздника
     showCelebration();
     
+    // Звук успеха
+    playSuccessSound();
+    
     // Вибрация (если поддерживается)
     if (navigator.vibrate) {
         navigator.vibrate([100, 50, 100]);
@@ -188,16 +320,24 @@ function handleIncorrectAnswer(userAnswer) {
     wrongBtn.style.backgroundColor = '#f44336';
     wrongBtn.style.transform = 'scale(0.9)';
     
+    // Звук ошибки (мягкий для детей)
+    playErrorSound();
+    
     // Легкая вибрация ошибки
     if (navigator.vibrate) {
         navigator.vibrate(200);
     }
     
-    // Через 2 секунды возвращаем обычный вид и показываем следующую карточку
+    // Повторяем аудио правильного ответа
+    setTimeout(() => {
+        playCardAudio();
+    }, 1000);
+    
+    // Через 3 секунды возвращаем обычный вид и показываем следующую карточку
     setTimeout(() => {
         resetButtonStyles();
         nextCardBtn.style.display = 'block';
-    }, 2000);
+    }, 3000);
 }
 
 // Сброс стилей кнопок
@@ -314,11 +454,71 @@ document.addEventListener('touchend', function (event) {
     lastTouchEnd = now;
 }, false);
 
+// Инициализация голосов для TTS
+function initVoices() {
+    if ('speechSynthesis' in window) {
+        // Загружаем голоса
+        const loadVoices = () => {
+            const voices = speechSynthesis.getVoices();
+            console.log('Доступные голоса:', voices.map(v => `${v.name} (${v.lang})`));
+        };
+        
+        speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices(); // Загружаем сразу, если уже доступны
+    }
+}
+
 // Запуск игры
 document.addEventListener('DOMContentLoaded', function() {
+    initVoices();
     preloadImages();
     initGame();
 });
+
+// Звуковые эффекты
+function playSuccessSound() {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance('Ajoyib! Sog!');
+        utterance.lang = 'uz-UZ';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.3;
+        utterance.volume = 0.8;
+        
+        const voices = speechSynthesis.getVoices();
+        const uzbekVoice = voices.find(voice => 
+            voice.lang.includes('uz') || 
+            voice.lang.includes('tr')
+        );
+        
+        if (uzbekVoice) {
+            utterance.voice = uzbekVoice;
+        }
+        
+        speechSynthesis.speak(utterance);
+    }
+}
+
+function playErrorSound() {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance('Qaytadan urinib koring');
+        utterance.lang = 'uz-UZ';
+        utterance.rate = 0.8;
+        utterance.pitch = 0.9;
+        utterance.volume = 0.7;
+        
+        const voices = speechSynthesis.getVoices();
+        const uzbekVoice = voices.find(voice => 
+            voice.lang.includes('uz') || 
+            voice.lang.includes('tr')
+        );
+        
+        if (uzbekVoice) {
+            utterance.voice = uzbekVoice;
+        }
+        
+        speechSynthesis.speak(utterance);
+    }
+}
 
 // Для Telegram Web App
 if (window.Telegram && window.Telegram.WebApp) {

@@ -9,6 +9,13 @@
 </head>
 <body>
     <div class="game-container">
+        <!-- Заголовок игры -->
+        <div class="game-header">
+            <div class="header-icon">🎓</div>
+            <h1 class="game-title">SO'Z va GAP O'yini</h1>
+            <p class="game-subtitle">Suratlarni ko'rib, tovushlarni tinglang!</p>
+        </div>
+        
         <!-- Счетчик звездочек -->
         <div class="score-container">
             <div class="stars" id="stars">
@@ -23,6 +30,9 @@
                 <div class="card" id="gameCard">
                     <div class="card-content">
                         <img id="cardImage" src="" alt="" class="card-image">
+                        <button class="audio-btn" id="audioBtn" onclick="playCardAudio()">
+                            <span class="speaker-icon">🔊</span>
+                        </button>
                         <div class="golden-glow" id="goldenGlow"></div>
                     </div>
                 </div>

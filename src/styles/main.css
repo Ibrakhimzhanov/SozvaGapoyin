@@ -25,6 +25,37 @@ body {
     justify-content: space-between;
 }
 
+/* Заголовок игры */
+.game-header {
+    background: linear-gradient(135deg, #4ECDC4, #44A08D);
+    padding: 15px 20px;
+    border-radius: 0 0 25px 25px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: -10px -10px 10px -10px;
+}
+
+.header-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.game-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 5px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+.game-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-weight: 500;
+}
+
 /* Счетчик звездочек */
 .score-container {
     text-align: center;
@@ -101,6 +132,52 @@ body {
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+}
+
+/* Кнопка аудио */
+.audio-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.audio-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+}
+
+.audio-btn:active {
+    transform: scale(0.95);
+}
+
+.speaker-icon {
+    font-size: 24px;
+    display: block;
+    line-height: 1;
+}
+
+.audio-btn.playing {
+    animation: pulse-audio 1s infinite;
+}
+
+@keyframes pulse-audio {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(255, 107, 107, 0.8);
+    }
 }
 
 /* Золотое сияние */
@@ -301,9 +378,28 @@ body {
 
 /* Адаптивность для мобильных */
 @media (max-width: 380px) {
+    .game-title {
+        font-size: 24px;
+    }
+    
+    .game-subtitle {
+        font-size: 12px;
+    }
+    
     .card {
         padding: 20px;
         max-width: 250px;
+    }
+    
+    .audio-btn {
+        width: 40px;
+        height: 40px;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .speaker-icon {
+        font-size: 20px;
     }
     
     .answer-btn {
@@ -323,17 +419,43 @@ body {
 
 /* Telegram Web App стили */
 @media (max-height: 600px) {
+    .game-header {
+        padding: 10px 15px;
+    }
+    
+    .header-icon {
+        font-size: 24px;
+        margin-bottom: 4px;
+    }
+    
+    .game-title {
+        font-size: 22px;
+    }
+    
+    .game-subtitle {
+        font-size: 11px;
+    }
+    
     .card {
         padding: 15px;
         max-width: 200px;
     }
     
+    .audio-btn {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .speaker-icon {
+        font-size: 18px;
+    }
+    
     .score-container {
-        padding: 10px 0;
+        padding: 8px 0;
     }
     
     .stars {
-        font-size: 20px;
+        font-size: 18px;
     }
 }
 
