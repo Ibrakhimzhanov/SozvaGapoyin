@@ -45,13 +45,6 @@ const gameCards = [
     },
     {
         type: 'word',
-        image: 'https://page.gensparksite.com/v1/base64_upload/1fdba870473c00a08374ba0233fdfa42', // Котенок на траве
-        correctAnswer: 'word',
-        uzbekText: "Mushuk",
-        audioFile: "assets/audio/mushuk_cat.mp3"
-    },
-    {
-        type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/9047c0869a33e9cb12ee2583f8cdbe82', // Дом
         correctAnswer: 'word',
         uzbekText: "Uy",
@@ -78,7 +71,7 @@ const gameCards = [
         image: 'https://page.gensparksite.com/v1/base64_upload/23bf49411dde75908263605dd6a1c47d', // Медведь ест яблоко
         correctAnswer: 'sentence',
         uzbekText: "Ayiq olma yeydi",
-        audioFile: "assets/audio/ayiq_olma_yeydi.mp3"
+        audioFile: "assets/audio/  .mp3"
     }
 ];
 
