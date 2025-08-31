@@ -25,6 +25,37 @@ body {
     justify-content: space-between;
 }
 
+/* Заголовок игры */
+.game-header {
+    background: linear-gradient(135deg, #4ECDC4, #44A08D);
+    padding: 15px 20px;
+    border-radius: 0 0 25px 25px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: -10px -10px 10px -10px;
+}
+
+.header-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.game-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 5px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+.game-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-weight: 500;
+}
+
 /* Счетчик звездочек */
 .score-container {
     text-align: center;
@@ -80,10 +111,41 @@ body {
     max-width: 300px;
     width: 100%;
     aspect-ratio: 1;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.15),
+        0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
 .card:active {
-    transform: scale(0.95);
+    transform: scale(0.97);
+}
+
+/* Индикация кликабельности */
+.card::after {
+    content: '👆 Нажмите для произношения';
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.card:hover::after {
+    opacity: 1;
 }
 
 .card-content {
@@ -101,6 +163,52 @@ body {
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+}
+
+/* Кнопка аудио */
+.audio-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.audio-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+}
+
+.audio-btn:active {
+    transform: scale(0.95);
+}
+
+.speaker-icon {
+    font-size: 24px;
+    display: block;
+    line-height: 1;
+}
+
+.audio-btn.playing {
+    animation: pulse-audio 1s infinite;
+}
+
+@keyframes pulse-audio {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(255, 107, 107, 0.8);
+    }
 }
 
 /* Золотое сияние */
@@ -267,43 +375,38 @@ body {
     }
 }
 
-/* Кнопка следующей карточки */
-.next-card-btn {
-    background: linear-gradient(135deg, #A8E6CF, #7FDBDA);
-    color: #2C3E50;
-    padding: 15px 25px;
-    border-radius: 25px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 18px;
-    cursor: pointer;
-    margin: 20px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    animation: bounce 2s infinite;
-}
 
-.next-card-btn:active {
-    transform: scale(0.95);
-}
-
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-5px);
-    }
-    60% {
-        transform: translateY(-3px);
-    }
-}
 
 /* Адаптивность для мобильных */
 @media (max-width: 380px) {
+    .game-title {
+        font-size: 24px;
+    }
+    
+    .game-subtitle {
+        font-size: 12px;
+    }
+    
     .card {
         padding: 20px;
         max-width: 250px;
+    }
+    
+    .card::after {
+        content: '👆';
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+    
+    .audio-btn {
+        width: 40px;
+        height: 40px;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .speaker-icon {
+        font-size: 20px;
     }
     
     .answer-btn {
@@ -323,22 +426,48 @@ body {
 
 /* Telegram Web App стили */
 @media (max-height: 600px) {
+    .game-header {
+        padding: 10px 15px;
+    }
+    
+    .header-icon {
+        font-size: 24px;
+        margin-bottom: 4px;
+    }
+    
+    .game-title {
+        font-size: 22px;
+    }
+    
+    .game-subtitle {
+        font-size: 11px;
+    }
+    
     .card {
         padding: 15px;
         max-width: 200px;
     }
     
+    .audio-btn {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .speaker-icon {
+        font-size: 18px;
+    }
+    
     .score-container {
-        padding: 10px 0;
+        padding: 8px 0;
     }
     
     .stars {
-        font-size: 20px;
+        font-size: 18px;
     }
 }
 
 /* Отключение выделения текста */
-.answer-btn, .card, .next-card-btn {
+.answer-btn, .card {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -375,5 +504,201 @@ body {
     100% {
         transform: translateX(-100%) scale(0.8);
         opacity: 0;
+    }
+}
+
+/* Экран завершения игры */
+.game-complete-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.5s ease;
+}
+
+.game-complete-screen.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.completion-card {
+    background: white;
+    border-radius: 25px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    max-width: 90%;
+    width: 400px;
+    animation: bounceIn 0.6s ease-out;
+}
+
+.completion-header {
+    margin-bottom: 30px;
+}
+
+.completion-icon {
+    font-size: 80px;
+    margin-bottom: 15px;
+    animation: rotateIcon 2s ease-in-out infinite;
+}
+
+.completion-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #333;
+    margin: 10px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.completion-subtitle {
+    font-size: 20px;
+    color: #666;
+    margin: 0;
+}
+
+.score-summary {
+    margin: 30px 0;
+    padding: 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 20px;
+    color: white;
+}
+
+.final-stars {
+    font-size: 32px;
+    margin-bottom: 15px;
+    animation: sparkle 1.5s ease-in-out infinite;
+}
+
+.score-text {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 15px 0;
+    line-height: 1.4;
+}
+
+.score-text span {
+    font-weight: 800;
+    font-size: 20px;
+}
+
+.percentage {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.restart-section {
+    margin-top: 30px;
+}
+
+.restart-btn {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+.restart-btn:active {
+    transform: translateY(0);
+}
+
+.restart-icon {
+    font-size: 20px;
+}
+
+/* Анимации */
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes rotateIcon {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(-10deg) scale(1.1);
+    }
+    75% {
+        transform: rotate(10deg) scale(1.1);
+    }
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Мобильная адаптация */
+@media (max-width: 480px) {
+    .completion-card {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+    
+    .completion-icon {
+        font-size: 60px;
+    }
+    
+    .completion-title {
+        font-size: 28px;
+    }
+    
+    .completion-subtitle {
+        font-size: 16px;
+    }
+    
+    .score-text {
+        font-size: 16px;
+    }
+    
+    .percentage {
+        font-size: 24px;
+    }
+    
+    .restart-btn {
+        padding: 12px 25px;
+        font-size: 16px;
     }
 }

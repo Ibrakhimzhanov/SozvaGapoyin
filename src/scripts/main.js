@@ -1,69 +1,85 @@
-// Игровые данные с использованием предоставленных изображений
+// Игровые данные с аудио на узбекском языке
 const gameCards = [
     // Картинки отдельных предметов - SO'Z (слова)
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/cff9786b5c55b3e2279ca47565526131', // Мяч
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "To'p",
+        audioFile: "assets/audio/top_ball.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/307839f3489e6d96919b4fae2911da3f', // Яблоко
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Olma",
+        audioFile: "assets/audio/olma_apple.mp3"
     },
     {
         type: 'word', 
         image: 'https://page.gensparksite.com/v1/base64_upload/34e8ed89d550725f30d5c0a7ab3d8e5f', // Солнце
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Quyosh",
+        audioFile: "assets/audio/quyosh_sun.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/6b3d748cd990f844fd4f468aecdf9668', // Птичка
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Qush",
+        audioFile: "assets/audio/qush_bird.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/219d0f515902aefd611dbc2c75152b05', // Цветок
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Gul",
+        audioFile: "assets/audio/gul_flower.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/1b933396c15d8e3aec7936ad9c0107b4', // Котенок у дома
-        correctAnswer: 'word'
-    },
-    {
-        type: 'word',
-        image: 'https://page.gensparksite.com/v1/base64_upload/1fdba870473c00a08374ba0233fdfa42', // Котенок на траве
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Mushuk",
+        audioFile: "assets/audio/mushuk_cat.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/9047c0869a33e9cb12ee2583f8cdbe82', // Дом
-        correctAnswer: 'word'
+        correctAnswer: 'word',
+        uzbekText: "Uy",
+        audioFile: "assets/audio/uy_house.mp3"
     },
     
     // Сценки и действия - GAP (предложения)
     {
         type: 'sentence',
         image: 'https://page.gensparksite.com/v1/base64_upload/150b51571fcec876fe4ad8a152f3ef03', // Ребенок спит с мишкой
-        correctAnswer: 'sentence'
+        correctAnswer: 'sentence',
+        uzbekText: "Bola uxlaydi",
+        audioFile: "assets/audio/bola_uxlaydi.mp3"
     },
     {
         type: 'sentence', 
         image: 'https://page.gensparksite.com/v1/base64_upload/544343a0091c6f8bb1c004009018fbc2', // Девочка поет
-        correctAnswer: 'sentence'
+        correctAnswer: 'sentence',
+        uzbekText: "Qiz kuylaydi",
+        audioFile: "assets/audio/qiz_kuylaydi.mp3"
     },
     {
         type: 'sentence',
         image: 'https://page.gensparksite.com/v1/base64_upload/23bf49411dde75908263605dd6a1c47d', // Медведь ест яблоко
-        correctAnswer: 'sentence'
+        correctAnswer: 'sentence',
+        uzbekText: "Ayiq olma yeydi",
+        audioFile: "assets/audio/  .mp3"
     }
 ];
 
 // Игровые переменные
 let currentCardIndex = 0;
 let score = 0;
-let gameState = 'waiting'; // waiting, answered, correct, incorrect
+let totalQuestions = 0;
+let gameState = 'waiting'; // waiting, answered, correct, incorrect, completed
 
 // Элементы DOM
 const cardImage = document.getElementById('cardImage');
@@ -71,10 +87,16 @@ const scoreElement = document.getElementById('score');
 const goldenGlow = document.getElementById('goldenGlow');
 const confetti = document.getElementById('confetti');
 const celebration = document.getElementById('celebration');
-const nextCardBtn = document.getElementById('nextCardBtn');
 const gameCard = document.getElementById('gameCard');
 const wordBtn = document.getElementById('wordBtn');
 const sentenceBtn = document.getElementById('sentenceBtn');
+const audioBtn = document.getElementById('audioBtn');
+const gameCompleteScreen = document.getElementById('gameCompleteScreen');
+const restartBtn = document.getElementById('restartBtn');
+
+// Аудио система
+let currentAudio = null;
+let isAudioLoading = false;
 
 // Инициализация игры
 function initGame() {
@@ -82,6 +104,13 @@ function initGame() {
     shuffleArray(gameCards);
     currentCardIndex = 0;
     score = 0;
+    totalQuestions = gameCards.length;
+    gameState = 'waiting';
+    
+    // Скрываем экран завершения если он показан
+    gameCompleteScreen.style.display = 'none';
+    gameCompleteScreen.classList.remove('active');
+    
     updateScore();
     showCurrentCard();
 }
@@ -97,27 +126,24 @@ function shuffleArray(array) {
 // Показать текущую карточку
 function showCurrentCard() {
     if (currentCardIndex >= gameCards.length) {
-        // Игра завершена, отправляем результат в Telegram
-        sendResultToTelegram();
-        currentCardIndex = 0;
-        score = 0;
-        updateScore();
-        shuffleArray(gameCards);
+        // Игра завершена, показываем результат
+        showGameComplete();
+        return;
     }
 
     const currentCard = gameCards[currentCardIndex];
+    console.log('🎴 Карточка:', currentCard.uzbekText, '(тип:', currentCard.type + ')');
     
     // Анимация появления новой карточки
     gameCard.classList.add('slide-in');
     
     // Загружаем изображение
     cardImage.src = currentCard.image;
-    cardImage.alt = `Карточка ${currentCardIndex + 1}`;
+    cardImage.alt = currentCard.uzbekText;
     
     // Сбрасываем состояние
     gameState = 'waiting';
     goldenGlow.classList.remove('active');
-    nextCardBtn.style.display = 'none';
     
     // Активируем кнопки
     wordBtn.disabled = false;
@@ -125,18 +151,123 @@ function showCurrentCard() {
     wordBtn.style.opacity = '1';
     sentenceBtn.style.opacity = '1';
     
+    // Останавливаем предыдущее аудио
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+    isAudioLoading = false;
+    audioBtn.classList.remove('playing');
+    
     // Убираем анимацию через время
     setTimeout(() => {
         gameCard.classList.remove('slide-in');
+        // Автоматически воспроизводим аудио через 1 секунду
+        setTimeout(() => {
+            playCardAudio();
+        }, 1000);
     }, 800);
 }
 
+// Воспроизведение аудио для текущей карточки
+function playCardAudio() {
+    if (isAudioLoading || currentCardIndex >= gameCards.length) {
+        console.log('Аудио уже проигрывается или нет карточек');
+        return;
+    }
+    
+    const currentCard = gameCards[currentCardIndex];
+    console.log('Воспроизведение аудио для:', currentCard.uzbekText);
+    
+    try {
+        isAudioLoading = true;
+        audioBtn.classList.add('playing');
+        
+        // Останавливаем предыдущее аудио если есть
+        if (currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+        }
+        
+        // Создаем новый аудио элемент
+        currentAudio = new Audio(currentCard.audioFile);
+        
+        // Настройки для мобильных устройств
+        currentAudio.preload = 'auto';
+        currentAudio.volume = 1.0;
+        
+        // Обработчики событий
+        currentAudio.onloadstart = () => {
+            console.log('🔄 Загрузка аудио начата:', currentCard.audioFile);
+        };
+        
+        currentAudio.oncanplay = () => {
+            console.log('✅ Аудио готово к воспроизведению');
+        };
+        
+        currentAudio.onplay = () => {
+            console.log('▶️ Аудио начато');
+        };
+        
+        currentAudio.onended = () => {
+            console.log('✅ Аудио завершено');
+            audioBtn.classList.remove('playing');
+            isAudioLoading = false;
+        };
+        
+        currentAudio.onerror = (event) => {
+            console.log('❌ Ошибка загрузки аудио:', event);
+            console.log('Файл:', currentCard.audioFile);
+            audioBtn.classList.remove('playing');
+            isAudioLoading = false;
+            
+            // Показываем уведомление пользователю
+            if (navigator.vibrate) {
+                navigator.vibrate(100);
+            }
+        };
+        
+        // Запускаем воспроизведение
+        const playPromise = currentAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('🎵 Воспроизведение успешно запущено');
+                })
+                .catch(error => {
+                    console.log('❌ Ошибка воспроизведения:', error);
+                    audioBtn.classList.remove('playing');
+                    isAudioLoading = false;
+                    
+                    // Для мобильных - может потребоваться взаимодействие пользователя
+                    if (error.name === 'NotAllowedError') {
+                        console.log('⚠️ Требуется взаимодействие пользователя для воспроизведения аудио');
+                    }
+                });
+        }
+        
+    } catch (error) {
+        console.log('❌ Критическая ошибка воспроизведения:', error);
+        audioBtn.classList.remove('playing');
+        isAudioLoading = false;
+    }
+}
+
+
+
 // Обработка выбора ответа
 function selectAnswer(userAnswer) {
-    if (gameState !== 'waiting') return;
+    console.log('Выбран ответ:', userAnswer, 'Состояние игры:', gameState);
+    
+    if (gameState !== 'waiting') {
+        console.log('Игра не в состоянии ожидания, игнорируем клик');
+        return;
+    }
     
     const currentCard = gameCards[currentCardIndex];
     const isCorrect = userAnswer === currentCard.correctAnswer;
+    console.log('Ответ правильный:', isCorrect);
     
     gameState = isCorrect ? 'correct' : 'incorrect';
     
@@ -153,6 +284,8 @@ function selectAnswer(userAnswer) {
 
 // Обработка правильного ответа
 function handleCorrectAnswer() {
+    console.log('✅ Правильный ответ! Переход через 2.5 сек');
+    
     // Увеличиваем счет
     score++;
     updateScore();
@@ -166,19 +299,36 @@ function handleCorrectAnswer() {
     // Анимация праздника
     showCelebration();
     
+    // Звук успеха "Ajoyib zo'r!"
+    playSuccessSound();
+    
     // Вибрация (если поддерживается)
     if (navigator.vibrate) {
         navigator.vibrate([100, 50, 100]);
     }
     
-    // Показываем кнопку следующей карточки через 2 секунды
+    // Принудительный переход через 2.5 секунды  
+    const transitionTimer = setTimeout(() => {
+        console.log('⏰ Таймер сработал - переходим к следующей карточке');
+        nextCard();
+    }, 2500);
+    
+    // Сохраняем таймер для возможной очистки
+    window.currentTransitionTimer = transitionTimer;
+    
+    // Дублирующий таймер на случай сбоя
     setTimeout(() => {
-        nextCardBtn.style.display = 'block';
-    }, 2000);
+        if (gameState === 'correct') {
+            console.log('🔄 Дублирующий таймер - принудительный переход');
+            nextCard();
+        }
+    }, 3000);
 }
 
 // Обработка неправильного ответа
 function handleIncorrectAnswer(userAnswer) {
+    console.log('❌ Неправильный ответ. Повтор + переход через 4 сек');
+    
     // Показываем правильный ответ визуально
     const correctBtn = gameCards[currentCardIndex].correctAnswer === 'word' ? wordBtn : sentenceBtn;
     const wrongBtn = userAnswer === 'word' ? wordBtn : sentenceBtn;
@@ -191,16 +341,37 @@ function handleIncorrectAnswer(userAnswer) {
     wrongBtn.style.backgroundColor = '#f44336';
     wrongBtn.style.transform = 'scale(0.9)';
     
+    // Звук ошибки (мягкий для детей)
+    playErrorSound();
+    
     // Легкая вибрация ошибки
     if (navigator.vibrate) {
         navigator.vibrate(200);
     }
     
-    // Через 2 секунды возвращаем обычный вид и показываем следующую карточку
+    // Повторяем аудио правильного ответа через 1 секунду
     setTimeout(() => {
+        playCardAudio();
+    }, 1000);
+    
+    // Принудительный переход через 4 секунды
+    const transitionTimer = setTimeout(() => {
+        console.log('⏰ Таймер сработал - сбрасываем стили и переходим');
         resetButtonStyles();
-        nextCardBtn.style.display = 'block';
-    }, 2000);
+        nextCard();
+    }, 4000);
+    
+    // Сохраняем таймер
+    window.currentTransitionTimer = transitionTimer;
+    
+    // Дублирующий таймер на случай сбоя  
+    setTimeout(() => {
+        if (gameState === 'incorrect') {
+            console.log('🔄 Дублирующий таймер - принудительный переход');
+            resetButtonStyles();
+            nextCard();
+        }
+    }, 4500);
 }
 
 // Сброс стилей кнопок
@@ -213,12 +384,30 @@ function resetButtonStyles() {
 
 // Переход к следующей карточке
 function nextCard() {
-    nextCardBtn.style.display = 'none';
+    console.log('🔄 Следующая карточка... Текущий индекс:', currentCardIndex);
+    
+    // Очищаем предыдущие таймеры если есть
+    if (window.currentTransitionTimer) {
+        clearTimeout(window.currentTransitionTimer);
+        window.currentTransitionTimer = null;
+    }
+    
+    // Останавливаем любое аудио
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+    isAudioLoading = false;
+    audioBtn.classList.remove('playing');
+    
+    // Сбрасываем золотое сияние
+    goldenGlow.classList.remove('active');
     
     // Анимация исчезновения
     gameCard.classList.add('slide-out');
     
     setTimeout(() => {
+        console.log('🎴 Переходим от карточки', currentCardIndex, 'к', currentCardIndex + 1);
         gameCard.classList.remove('slide-out');
         currentCardIndex++;
         resetButtonStyles();
@@ -237,13 +426,7 @@ function updateScore() {
     }, 300);
 }
 
-// Отправка результата в чат Telegram
-function sendResultToTelegram() {
-    if (window.Telegram && window.Telegram.WebApp) {
-        const resultData = JSON.stringify({ score });
-        window.Telegram.WebApp.sendData(resultData);
-    }
-}
+
 
 // Показать конфетти
 function showConfetti() {
@@ -325,11 +508,303 @@ document.addEventListener('touchend', function (event) {
     lastTouchEnd = now;
 }, false);
 
+// Предзагрузка аудиофайлов для лучшей производительности
+function preloadAudioFiles() {
+    console.log('🔄 Предзагрузка аудиофайлов...');
+    
+    gameCards.forEach((card, index) => {
+        if (card.audioFile) {
+            const audio = new Audio(card.audioFile);
+            audio.preload = 'metadata'; // Загружаем только метаданные для экономии трафика
+            
+            audio.onloadedmetadata = () => {
+                console.log(`✅ Предзагружено аудио ${index + 1}/${gameCards.length}: ${card.uzbekText}`);
+            };
+            
+            audio.onerror = (error) => {
+                console.log(`❌ Ошибка предзагрузки аудио для "${card.uzbekText}":`, error);
+            };
+        }
+    });
+    
+    // Предзагружаем поздравление
+    const successAudio = new Audio('assets/audio/ajoyib_zor.mp3');
+    successAudio.preload = 'metadata';
+    successAudio.onloadedmetadata = () => {
+        console.log('✅ Предзагружено поздравление');
+    };
+    
+    // Предзагружаем финальное сообщение
+    const finalAudio = new Audio('assets/audio/barakalla_message.mp3');
+    finalAudio.preload = 'metadata';
+    finalAudio.onloadedmetadata = () => {
+        console.log('✅ Предзагружено финальное сообщение');
+    };
+}
+
+// Добавляем обработчики событий
+function addEventListeners() {
+    // Обработчик клика на карточку
+    gameCard.addEventListener('click', function(event) {
+        // Если клик был не по кнопке аудио и не по кнопкам ответов
+        if (!event.target.closest('.audio-btn') && !event.target.closest('.answer-btn')) {
+            console.log('🎵 Клик на карточку - воспроизведение');
+            playCardAudio();
+        }
+    });
+    
+    // Обработчик клика на кнопку аудио
+    audioBtn.addEventListener('click', function(event) {
+        console.log('🔊 Кнопка аудио');
+        event.stopPropagation();
+        playCardAudio();
+    });
+    
+    // Обработчик клика на кнопку SO'Z
+    wordBtn.addEventListener('click', function(event) {
+        console.log('📝 Выбор: SO\'Z');
+        event.stopPropagation();
+        selectAnswer('word');
+    });
+    
+    // Обработчик клика на кнопку GAP
+    sentenceBtn.addEventListener('click', function(event) {
+        console.log('📝 Выбор: GAP');
+        event.stopPropagation();
+        selectAnswer('sentence');
+    });
+    
+    // Обработчик для кнопки перезапуска
+    restartBtn.addEventListener('click', function(event) {
+        console.log('🔄 Перезапуск игры');
+        event.stopPropagation();
+        restartGame();
+    });
+}
+
 // Запуск игры
 document.addEventListener('DOMContentLoaded', function() {
+    preloadAudioFiles();
     preloadImages();
+    addEventListeners();
     initGame();
+    
+    // Инициализация аудиоконтекста для мобильных устройств
+    initMobileAudio();
 });
+
+// Инициализация аудио для мобильных устройств
+function initMobileAudio() {
+    // На мобильных устройствах аудио может требовать пользовательского взаимодействия
+    const unlockAudio = () => {
+        console.log('🔓 Разблокировка аудио для мобильных устройств');
+        
+        // Создаем тихий звук для разблокировки
+        const silence = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSxuzu3WfCsII3THsd+OPwgXZrns5KFQDQ1BnODwxGwkfCF1yO3YgC0JK2671OyWQAlZpeDnpm8MEl+YzPLPfC4MG3PHstqAQAYfaP3f0IfRC5BhYRZ+4KRaGAh5yNr1zkEFNGa93tNOPS0BLPLI9d5/QggS/PBgIMR8GkCGYmfrLKAjrAJYK+naqk4PBhjKy+fQcicHLHDO8WBPL7nbuhQ');
+        silence.volume = 0.01;
+        
+        const playPromise = silence.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('✅ Аудио разблокировано для мобильных устройств');
+                    
+                    // Удаляем обработчики после успешной разблокировки
+                    document.removeEventListener('touchstart', unlockAudio);
+                    document.removeEventListener('touchend', unlockAudio);
+                    document.removeEventListener('mousedown', unlockAudio);
+                    document.removeEventListener('keydown', unlockAudio);
+                })
+                .catch(error => {
+                    console.log('⚠️ Не удалось разблокировать аудио:', error);
+                });
+        }
+    };
+    
+    // Добавляем обработчики для разблокировки аудио
+    document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
+    document.addEventListener('touchend', unlockAudio, { once: true, passive: true });
+    document.addEventListener('mousedown', unlockAudio, { once: true });
+    document.addEventListener('keydown', unlockAudio, { once: true });
+}
+
+// Звуковые эффекты
+function playSuccessSound() {
+    console.log('🎉 Воспроизведение звука успеха');
+    
+    try {
+        // Останавливаем текущее аудио
+        if (currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
+        }
+        
+        // Создаем аудио для поздравления
+        const successAudio = new Audio('assets/audio/ajoyib_zor.mp3');
+        successAudio.volume = 0.9;
+        
+        successAudio.onplay = () => {
+            console.log('🎊 Поздравление воспроизводится');
+        };
+        
+        successAudio.onerror = (error) => {
+            console.log('❌ Ошибка воспроизведения поздравления:', error);
+        };
+        
+        const playPromise = successAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('✅ Поздравление успешно воспроизведено');
+                })
+                .catch(error => {
+                    console.log('⚠️ Не удалось воспроизвести поздравление:', error);
+                });
+        }
+        
+    } catch (error) {
+        console.log('❌ Критическая ошибка воспроизведения поздравления:', error);
+    }
+}
+
+function playErrorSound() {
+    console.log('⚠️ Мягкое уведомление об ошибке (без звука)');
+    // Для детей используем только визуальную обратную связь
+    // Аудиоповтор правильного ответа происходит в handleIncorrectAnswer()
+}
+
+// Показать экран завершения игры
+function showGameComplete() {
+    console.log('🏆 Игра завершена! Счет:', score, 'из', totalQuestions);
+    
+    gameState = 'completed';
+    
+    // Вычисляем процент правильных ответов
+    const percentage = Math.round((score / totalQuestions) * 100);
+    
+    // Останавливаем любое аудио
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+    
+    // Отправляем результат в Telegram если доступно
+    sendResultToTelegram(score, totalQuestions, percentage);
+    
+    // Обновляем данные на экране завершения
+    document.getElementById('correctAnswers').textContent = score;
+    document.getElementById('totalQuestions').textContent = totalQuestions;
+    document.getElementById('percentage').textContent = percentage + '%';
+    
+    // Обновляем звездочки в зависимости от результата
+    const finalStars = document.getElementById('finalStars');
+    if (percentage >= 90) {
+        finalStars.textContent = '⭐⭐⭐⭐⭐';
+    } else if (percentage >= 70) {
+        finalStars.textContent = '⭐⭐⭐⭐';
+    } else if (percentage >= 50) {
+        finalStars.textContent = '⭐⭐⭐';
+    } else if (percentage >= 30) {
+        finalStars.textContent = '⭐⭐';
+    } else {
+        finalStars.textContent = '⭐';
+    }
+    
+    // Показываем экран завершения
+    gameCompleteScreen.style.display = 'flex';
+    
+    setTimeout(() => {
+        gameCompleteScreen.classList.add('active');
+        
+        // Воспроизводим финальное сообщение
+        setTimeout(() => {
+            playFinalMessage();
+        }, 800);
+    }, 100);
+}
+
+// Воспроизвести финальное сообщение
+function playFinalMessage() {
+    console.log('🎉 Воспроизведение финального сообщения');
+    
+    try {
+        const finalAudio = new Audio('assets/audio/barakalla_message.mp3');
+        finalAudio.volume = 0.9;
+        
+        finalAudio.onplay = () => {
+            console.log('🎊 Финальное сообщение воспроизводится');
+        };
+        
+        finalAudio.onerror = (error) => {
+            console.log('❌ Ошибка воспроизведения финального сообщения:', error);
+        };
+        
+        const playPromise = finalAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('✅ Финальное сообщение успешно воспроизведено');
+                })
+                .catch(error => {
+                    console.log('⚠️ Не удалось воспроизвести финальное сообщение:', error);
+                });
+        }
+        
+    } catch (error) {
+        console.log('❌ Критическая ошибка воспроизведения финального сообщения:', error);
+    }
+}
+
+// Перезапуск игры
+function restartGame() {
+    console.log('🚀 Перезапуск игры');
+    
+    // Скрываем экран завершения
+    gameCompleteScreen.classList.remove('active');
+    
+    setTimeout(() => {
+        gameCompleteScreen.style.display = 'none';
+        
+        // Перезапускаем игру
+        initGame();
+    }, 500);
+}
+
+// Принудительный переход к следующей карточке
+function forceNextCard() {
+    console.log('🚀 Принудительный переход к следующей карточке!');
+    gameState = 'waiting'; // Сбрасываем состояние
+    nextCard();
+}
+
+// Отправка результата в чат Telegram
+function sendResultToTelegram(score, totalQuestions, percentage) {
+    console.log('📱 Отправка результатов в Telegram:', { score, totalQuestions, percentage });
+    
+    if (window.Telegram && window.Telegram.WebApp) {
+        try {
+            // Создаем красивое сообщение результата
+            const resultMessage = {
+                score: score,
+                totalQuestions: totalQuestions,
+                percentage: percentage,
+                timestamp: new Date().toISOString(),
+                message: `Barakalla! Siz ${totalQuestions} ta savoldan ${score} tasiga to'g'ri javob berdingiz! (${percentage}%)`
+            };
+            
+            const resultData = JSON.stringify(resultMessage);
+            window.Telegram.WebApp.sendData(resultData);
+            
+            console.log('✅ Результат отправлен в Telegram чат');
+        } catch (error) {
+            console.log('❌ Ошибка отправки результата в Telegram:', error);
+        }
+    } else {
+        console.log('⚠️ Telegram Web App не доступен');
+    }
+}
 
 // Для Telegram Web App
 if (window.Telegram && window.Telegram.WebApp) {
