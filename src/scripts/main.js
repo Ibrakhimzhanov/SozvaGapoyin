@@ -242,7 +242,7 @@ function sendResultToTelegram() {
         window.Telegram.WebApp.showAlert(`Ваш результат: ${score}`);
 
         const mainButton = window.Telegram.WebApp.MainButton;
-        mainButton.setText('Tugatish');
+        mainButton.setText('Yopish');
         mainButton.onClick(() => {
             window.Telegram.WebApp.close();
         });
@@ -251,7 +251,7 @@ function sendResultToTelegram() {
         alert(`Ваш результат: ${score}`);
 
         const finishBtn = document.createElement('button');
-        finishBtn.textContent = 'Tugatish';
+        finishBtn.textContent = 'Yopish';
         finishBtn.style.marginTop = '20px';
         finishBtn.onclick = () => window.close();
         document.body.appendChild(finishBtn);
