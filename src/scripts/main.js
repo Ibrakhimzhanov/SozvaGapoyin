@@ -425,13 +425,15 @@ function nextCard() {
 // Обновление счета
 function updateScore() {
     scoreElement.textContent = score;
-    
+
     // Анимация увеличения счета
     scoreElement.style.transform = 'scale(1.3)';
     setTimeout(() => {
         scoreElement.style.transform = 'scale(1)';
     }, 300);
 }
+
+
 
 // Показать конфетти
 function showConfetti() {
