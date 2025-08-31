@@ -6,56 +6,56 @@ const gameCards = [
         image: 'https://page.gensparksite.com/v1/base64_upload/cff9786b5c55b3e2279ca47565526131', // Мяч
         correctAnswer: 'word',
         uzbekText: "To'p",
-        audioText: "To'p"
+        audioFile: "assets/audio/top_ball.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/307839f3489e6d96919b4fae2911da3f', // Яблоко
         correctAnswer: 'word',
         uzbekText: "Olma",
-        audioText: "Olma"
+        audioFile: "assets/audio/olma_apple.mp3"
     },
     {
         type: 'word', 
         image: 'https://page.gensparksite.com/v1/base64_upload/34e8ed89d550725f30d5c0a7ab3d8e5f', // Солнце
         correctAnswer: 'word',
         uzbekText: "Quyosh",
-        audioText: "Quyosh"
+        audioFile: "assets/audio/quyosh_sun.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/6b3d748cd990f844fd4f468aecdf9668', // Птичка
         correctAnswer: 'word',
         uzbekText: "Qush",
-        audioText: "Qush"
+        audioFile: "assets/audio/qush_bird.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/219d0f515902aefd611dbc2c75152b05', // Цветок
         correctAnswer: 'word',
         uzbekText: "Gul",
-        audioText: "Gul"
+        audioFile: "assets/audio/gul_flower.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/1b933396c15d8e3aec7936ad9c0107b4', // Котенок у дома
         correctAnswer: 'word',
         uzbekText: "Mushuk",
-        audioText: "Mushuk"
+        audioFile: "assets/audio/mushuk_cat.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/1fdba870473c00a08374ba0233fdfa42', // Котенок на траве
         correctAnswer: 'word',
         uzbekText: "Mushuk",
-        audioText: "Mushuk"
+        audioFile: "assets/audio/mushuk_cat.mp3"
     },
     {
         type: 'word',
         image: 'https://page.gensparksite.com/v1/base64_upload/9047c0869a33e9cb12ee2583f8cdbe82', // Дом
         correctAnswer: 'word',
         uzbekText: "Uy",
-        audioText: "Uy"
+        audioFile: "assets/audio/uy_house.mp3"
     },
     
     // Сценки и действия - GAP (предложения)
@@ -64,21 +64,21 @@ const gameCards = [
         image: 'https://page.gensparksite.com/v1/base64_upload/150b51571fcec876fe4ad8a152f3ef03', // Ребенок спит с мишкой
         correctAnswer: 'sentence',
         uzbekText: "Bola uxlaydi",
-        audioText: "Bola uxlaydi"
+        audioFile: "assets/audio/bola_uxlaydi.mp3"
     },
     {
         type: 'sentence', 
         image: 'https://page.gensparksite.com/v1/base64_upload/544343a0091c6f8bb1c004009018fbc2', // Девочка поет
         correctAnswer: 'sentence',
         uzbekText: "Qiz kuylaydi",
-        audioText: "Qiz kuylaydi"
+        audioFile: "assets/audio/qiz_kuylaydi.mp3"
     },
     {
         type: 'sentence',
         image: 'https://page.gensparksite.com/v1/base64_upload/23bf49411dde75908263605dd6a1c47d', // Медведь ест яблоко
         correctAnswer: 'sentence',
         uzbekText: "Ayiq olma yeydi",
-        audioText: "Ayiq olma yeydi"
+        audioFile: "assets/audio/ayiq_olma_yeydi.mp3"
     }
 ];
 
@@ -149,8 +149,9 @@ function showCurrentCard() {
     sentenceBtn.style.opacity = '1';
     
     // Останавливаем предыдущее аудио
-    if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
     }
     isAudioLoading = false;
     audioBtn.classList.remove('playing');
@@ -173,91 +174,78 @@ function playCardAudio() {
     }
     
     const currentCard = gameCards[currentCardIndex];
-    console.log('Воспроизведение аудио для:', currentCard.audioText);
+    console.log('Воспроизведение аудио для:', currentCard.uzbekText);
     
     try {
         isAudioLoading = true;
         audioBtn.classList.add('playing');
         
-        // Останавливаем предыдущее аудио
-        if (window.speechSynthesis.speaking) {
-            window.speechSynthesis.cancel();
+        // Останавливаем предыдущее аудио если есть
+        if (currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
         }
         
-        // Используем Web Speech API напрямую
-        if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(currentCard.audioText);
-            
-            // Настройки для узбекского языка
-            utterance.lang = 'uz-UZ';
-            utterance.rate = 0.8; // Медленная речь для детей
-            utterance.pitch = 1.1;
-            utterance.volume = 1.0;
-            
-            // Попробуем найти подходящий голос
-            const voices = speechSynthesis.getVoices();
-            console.log('Доступные голоса:', voices.map(v => `${v.name} (${v.lang})`));
-            
-            const uzbekVoice = voices.find(voice => 
-                voice.lang.includes('uz') || 
-                voice.lang.includes('tr') || 
-                voice.name.toLowerCase().includes('uzbek') ||
-                voice.name.toLowerCase().includes('turkish')
-            );
-            
-            if (uzbekVoice) {
-                utterance.voice = uzbekVoice;
-                console.log('Используем голос:', uzbekVoice.name);
-            } else {
-                console.log('Используем голос по умолчанию');
-            }
-            
-            utterance.onstart = () => {
-                console.log('Аудио начато');
-            };
-            
-            utterance.onend = () => {
-                console.log('Аудио завершено');
-                audioBtn.classList.remove('playing');
-                isAudioLoading = false;
-            };
-            
-            utterance.onerror = (event) => {
-                console.log('Ошибка аудио:', event.error);
-                // Если ошибка synthesis-failed, попробуем еще раз с английским голосом
-                if (event.error === 'synthesis-failed') {
-                    console.log('Пробуем с английским голосом');
-                    const englishUtterance = new SpeechSynthesisUtterance(currentCard.audioText);
-                    englishUtterance.lang = 'en-US';
-                    englishUtterance.rate = 0.8;
-                    englishUtterance.pitch = 1.1;
-                    
-                    englishUtterance.onend = () => {
-                        audioBtn.classList.remove('playing');
-                        isAudioLoading = false;
-                    };
-                    
-                    englishUtterance.onerror = () => {
-                        audioBtn.classList.remove('playing');
-                        isAudioLoading = false;
-                    };
-                    
-                    speechSynthesis.speak(englishUtterance);
-                } else {
-                    audioBtn.classList.remove('playing');
-                    isAudioLoading = false;
-                }
-            };
-            
-            speechSynthesis.speak(utterance);
-        } else {
-            console.log('Speech Synthesis не поддерживается');
+        // Создаем новый аудио элемент
+        currentAudio = new Audio(currentCard.audioFile);
+        
+        // Настройки для мобильных устройств
+        currentAudio.preload = 'auto';
+        currentAudio.volume = 1.0;
+        
+        // Обработчики событий
+        currentAudio.onloadstart = () => {
+            console.log('🔄 Загрузка аудио начата:', currentCard.audioFile);
+        };
+        
+        currentAudio.oncanplay = () => {
+            console.log('✅ Аудио готово к воспроизведению');
+        };
+        
+        currentAudio.onplay = () => {
+            console.log('▶️ Аудио начато');
+        };
+        
+        currentAudio.onended = () => {
+            console.log('✅ Аудио завершено');
             audioBtn.classList.remove('playing');
             isAudioLoading = false;
+        };
+        
+        currentAudio.onerror = (event) => {
+            console.log('❌ Ошибка загрузки аудио:', event);
+            console.log('Файл:', currentCard.audioFile);
+            audioBtn.classList.remove('playing');
+            isAudioLoading = false;
+            
+            // Показываем уведомление пользователю
+            if (navigator.vibrate) {
+                navigator.vibrate(100);
+            }
+        };
+        
+        // Запускаем воспроизведение
+        const playPromise = currentAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('🎵 Воспроизведение успешно запущено');
+                })
+                .catch(error => {
+                    console.log('❌ Ошибка воспроизведения:', error);
+                    audioBtn.classList.remove('playing');
+                    isAudioLoading = false;
+                    
+                    // Для мобильных - может потребоваться взаимодействие пользователя
+                    if (error.name === 'NotAllowedError') {
+                        console.log('⚠️ Требуется взаимодействие пользователя для воспроизведения аудио');
+                    }
+                });
         }
         
     } catch (error) {
-        console.log('Ошибка воспроизведения:', error);
+        console.log('❌ Критическая ошибка воспроизведения:', error);
         audioBtn.classList.remove('playing');
         isAudioLoading = false;
     }
@@ -402,8 +390,9 @@ function nextCard() {
     }
     
     // Останавливаем любое аудио
-    if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
     }
     isAudioLoading = false;
     audioBtn.classList.remove('playing');
@@ -514,26 +503,31 @@ document.addEventListener('touchend', function (event) {
     lastTouchEnd = now;
 }, false);
 
-// Инициализация голосов для TTS
-function initVoices() {
-    if ('speechSynthesis' in window) {
-        // Загружаем голоса
-        const loadVoices = () => {
-            const voices = speechSynthesis.getVoices();
-            console.log('Доступные голоса:', voices.map(v => `${v.name} (${v.lang})`));
+// Предзагрузка аудиофайлов для лучшей производительности
+function preloadAudioFiles() {
+    console.log('🔄 Предзагрузка аудиофайлов...');
+    
+    gameCards.forEach((card, index) => {
+        if (card.audioFile) {
+            const audio = new Audio(card.audioFile);
+            audio.preload = 'metadata'; // Загружаем только метаданные для экономии трафика
             
-            // Если голосов нет, используем резервный подход
-            if (voices.length === 0) {
-                console.log('Голоса еще не загружены, будем использовать голос по умолчанию');
-            }
-        };
-        
-        speechSynthesis.onvoiceschanged = loadVoices;
-        loadVoices(); // Загружаем сразу, если уже доступны
-        
-        // Дополнительная попытка через секунду
-        setTimeout(loadVoices, 1000);
-    }
+            audio.onloadedmetadata = () => {
+                console.log(`✅ Предзагружено аудио ${index + 1}/${gameCards.length}: ${card.uzbekText}`);
+            };
+            
+            audio.onerror = (error) => {
+                console.log(`❌ Ошибка предзагрузки аудио для "${card.uzbekText}":`, error);
+            };
+        }
+    });
+    
+    // Предзагружаем поздравление
+    const successAudio = new Audio('assets/audio/ajoyib_zor.mp3');
+    successAudio.preload = 'metadata';
+    successAudio.onloadedmetadata = () => {
+        console.log('✅ Предзагружено поздравление');
+    };
 }
 
 // Добавляем обработчики событий
@@ -571,62 +565,94 @@ function addEventListeners() {
 
 // Запуск игры
 document.addEventListener('DOMContentLoaded', function() {
-    initVoices();
+    preloadAudioFiles();
     preloadImages();
     addEventListeners();
     initGame();
+    
+    // Инициализация аудиоконтекста для мобильных устройств
+    initMobileAudio();
 });
+
+// Инициализация аудио для мобильных устройств
+function initMobileAudio() {
+    // На мобильных устройствах аудио может требовать пользовательского взаимодействия
+    const unlockAudio = () => {
+        console.log('🔓 Разблокировка аудио для мобильных устройств');
+        
+        // Создаем тихий звук для разблокировки
+        const silence = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSxuzu3WfCsII3THsd+OPwgXZrns5KFQDQ1BnODwxGwkfCF1yO3YgC0JK2671OyWQAlZpeDnpm8MEl+YzPLPfC4MG3PHstqAQAYfaP3f0IfRC5BhYRZ+4KRaGAh5yNr1zkEFNGa93tNOPS0BLPLI9d5/QggS/PBgIMR8GkCGYmfrLKAjrAJYK+naqk4PBhjKy+fQcicHLHDO8WBPL7nbuhQ');
+        silence.volume = 0.01;
+        
+        const playPromise = silence.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('✅ Аудио разблокировано для мобильных устройств');
+                    
+                    // Удаляем обработчики после успешной разблокировки
+                    document.removeEventListener('touchstart', unlockAudio);
+                    document.removeEventListener('touchend', unlockAudio);
+                    document.removeEventListener('mousedown', unlockAudio);
+                    document.removeEventListener('keydown', unlockAudio);
+                })
+                .catch(error => {
+                    console.log('⚠️ Не удалось разблокировать аудио:', error);
+                });
+        }
+    };
+    
+    // Добавляем обработчики для разблокировки аудио
+    document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
+    document.addEventListener('touchend', unlockAudio, { once: true, passive: true });
+    document.addEventListener('mousedown', unlockAudio, { once: true });
+    document.addEventListener('keydown', unlockAudio, { once: true });
+}
 
 // Звуковые эффекты
 function playSuccessSound() {
-    console.log('Воспроизведение звука успеха');
-    if ('speechSynthesis' in window) {
-        // Останавливаем предыдущую речь
-        speechSynthesis.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance('Ajoyib zor!');
-        utterance.lang = 'uz-UZ';
-        utterance.rate = 1.0;
-        utterance.pitch = 1.3;
-        utterance.volume = 0.8;
-        
-        const voices = speechSynthesis.getVoices();
-        const uzbekVoice = voices.find(voice => 
-            voice.lang.includes('uz') || 
-            voice.lang.includes('tr') ||
-            voice.name.toLowerCase().includes('turkish')
-        );
-        
-        if (uzbekVoice) {
-            utterance.voice = uzbekVoice;
+    console.log('🎉 Воспроизведение звука успеха');
+    
+    try {
+        // Останавливаем текущее аудио
+        if (currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
         }
         
-        speechSynthesis.speak(utterance);
+        // Создаем аудио для поздравления
+        const successAudio = new Audio('assets/audio/ajoyib_zor.mp3');
+        successAudio.volume = 0.9;
+        
+        successAudio.onplay = () => {
+            console.log('🎊 Поздравление воспроизводится');
+        };
+        
+        successAudio.onerror = (error) => {
+            console.log('❌ Ошибка воспроизведения поздравления:', error);
+        };
+        
+        const playPromise = successAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('✅ Поздравление успешно воспроизведено');
+                })
+                .catch(error => {
+                    console.log('⚠️ Не удалось воспроизвести поздравление:', error);
+                });
+        }
+        
+    } catch (error) {
+        console.log('❌ Критическая ошибка воспроизведения поздравления:', error);
     }
 }
 
 function playErrorSound() {
-    console.log('Воспроизведение звука ошибки');
-    if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance('Qaytadan urinib koring');
-        utterance.lang = 'uz-UZ';
-        utterance.rate = 0.8;
-        utterance.pitch = 0.9;
-        utterance.volume = 0.7;
-        
-        const voices = speechSynthesis.getVoices();
-        const uzbekVoice = voices.find(voice => 
-            voice.lang.includes('uz') || 
-            voice.lang.includes('tr') ||
-            voice.name.toLowerCase().includes('turkish')
-        );
-        
-        if (uzbekVoice) {
-            utterance.voice = uzbekVoice;
-        }
-        
-        speechSynthesis.speak(utterance);
-    }
+    console.log('⚠️ Мягкое уведомление об ошибке (без звука)');
+    // Для детей используем только визуальную обратную связь
+    // Аудиоповтор правильного ответа происходит в handleIncorrectAnswer()
 }
 
 // Принудительный переход к следующей карточке
