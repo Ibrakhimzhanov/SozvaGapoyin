@@ -239,11 +239,22 @@ function sendResultToTelegram() {
     if (window.Telegram && window.Telegram.WebApp) {
         const resultData = JSON.stringify({ score });
         window.Telegram.WebApp.sendData(resultData);
-        window.Telegram.WebApp.showAlert(`Ваш результат: ${score}`, () => {
+        window.Telegram.WebApp.showAlert(`Ваш результат: ${score}`);
+
+        const mainButton = window.Telegram.WebApp.MainButton;
+        mainButton.setText('Tugatish');
+        mainButton.onClick(() => {
             window.Telegram.WebApp.close();
         });
+        mainButton.show();
     } else {
         alert(`Ваш результат: ${score}`);
+
+        const finishBtn = document.createElement('button');
+        finishBtn.textContent = 'Tugatish';
+        finishBtn.style.marginTop = '20px';
+        finishBtn.onclick = () => window.close();
+        document.body.appendChild(finishBtn);
     }
 }
 
@@ -337,7 +348,8 @@ document.addEventListener('DOMContentLoaded', function() {
 if (window.Telegram && window.Telegram.WebApp) {
     window.Telegram.WebApp.ready();
     window.Telegram.WebApp.expand();
-    
+
     // Отключаем кнопку "Назад" в Telegram
     window.Telegram.WebApp.disableClosingConfirmation();
+    window.Telegram.WebApp.MainButton.hide();
 }
