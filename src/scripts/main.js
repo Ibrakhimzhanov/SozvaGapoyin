@@ -3,49 +3,49 @@ const gameCards = [
     // Картинки отдельных предметов - SO'Z (слова)
     {
         type: 'word',
-        image: 'https://page.gensparksite.com/v1/base64_upload/cff9786b5c55b3e2279ca47565526131', // Мяч
+        image: 'assets/img/top_ball.png', // Мяч
         correctAnswer: 'word',
         uzbekText: "To'p",
         audioFile: "assets/audio/top_ball.mp3"
     },
     {
         type: 'word',
-        image: 'https://page.gensparksite.com/v1/base64_upload/307839f3489e6d96919b4fae2911da3f', // Яблоко
+        image: 'assets/img/olma_apple.png', // Яблоко
         correctAnswer: 'word',
         uzbekText: "Olma",
         audioFile: "assets/audio/olma_apple.mp3"
     },
     {
         type: 'word', 
-        image: 'https://page.gensparksite.com/v1/base64_upload/34e8ed89d550725f30d5c0a7ab3d8e5f', // Солнце
+        image: 'assets/img/quyosh_sun.png', // Солнце
         correctAnswer: 'word',
         uzbekText: "Quyosh",
         audioFile: "assets/audio/quyosh_sun.mp3"
     },
     {
         type: 'word',
-        image: 'https://page.gensparksite.com/v1/base64_upload/6b3d748cd990f844fd4f468aecdf9668', // Птичка
+        image: 'assets/img/qush_bird.png', // Птичка
         correctAnswer: 'word',
         uzbekText: "Qush",
         audioFile: "assets/audio/qush_bird.mp3"
     },
     {
         type: 'word',
-        image: 'https://page.gensparksite.com/v1/base64_upload/219d0f515902aefd611dbc2c75152b05', // Цветок
+        image: 'assets/img/gul_flower.png', // Цветок
         correctAnswer: 'word',
         uzbekText: "Gul",
         audioFile: "assets/audio/gul_flower.mp3"
     },
     {
         type: 'word',
-        image: 'https://page.gensparksite.com/v1/base64_upload/1b933396c15d8e3aec7936ad9c0107b4', // Котенок у дома
+        image: 'assets/img/mushuk_cat.png', // Котенок у дома
         correctAnswer: 'word',
         uzbekText: "Mushuk",
         audioFile: "assets/audio/mushuk_cat.mp3"
     },
     {
         type: 'word',
-        image: 'https://page.gensparksite.com/v1/base64_upload/9047c0869a33e9cb12ee2583f8cdbe82', // Дом
+        image: 'assets/img/uy_house.png', // Дом
         correctAnswer: 'word',
         uzbekText: "Uy",
         audioFile: "assets/audio/uy_house.mp3"
@@ -54,24 +54,24 @@ const gameCards = [
     // Сценки и действия - GAP (предложения)
     {
         type: 'sentence',
-        image: 'https://page.gensparksite.com/v1/base64_upload/150b51571fcec876fe4ad8a152f3ef03', // Ребенок спит с мишкой
+        image: 'assets/img/bola_uxlaydi.png', // Ребенок спит с мишкой
         correctAnswer: 'sentence',
         uzbekText: "Bola uxlaydi",
         audioFile: "assets/audio/bola_uxlaydi.mp3"
     },
     {
         type: 'sentence', 
-        image: 'https://page.gensparksite.com/v1/base64_upload/544343a0091c6f8bb1c004009018fbc2', // Девочка поет
+        image: 'assets/img/qiz_kuylaydi.png', // Девочка поет
         correctAnswer: 'sentence',
         uzbekText: "Qiz kuylaydi",
         audioFile: "assets/audio/qiz_kuylaydi.mp3"
     },
     {
         type: 'sentence',
-        image: 'https://page.gensparksite.com/v1/base64_upload/23bf49411dde75908263605dd6a1c47d', // Медведь ест яблоко
+        image: 'assets/img/ayiq_olma_yeydi.png', // Медведь ест яблоко
         correctAnswer: 'sentence',
         uzbekText: "Ayiq olma yeydi",
-        audioFile: "assets/audio/  .mp3"
+        audioFile: "assets/audio/ayiq_olma_yeydi.mp3"
     }
 ];
 
