@@ -316,10 +316,22 @@ function handleCorrectAnswer() {
         navigator.vibrate([100, 50, 100]);
     }
     
-    // Автоматически переходим к следующей карточке через 2.5 секунды
-    setTimeout(() => {
+    // Принудительный переход через 2.5 секунды  
+    const transitionTimer = setTimeout(() => {
+        console.log('⏰ Таймер сработал - переходим к следующей карточке');
         nextCard();
     }, 2500);
+    
+    // Сохраняем таймер для возможной очистки
+    window.currentTransitionTimer = transitionTimer;
+    
+    // Дублирующий таймер на случай сбоя
+    setTimeout(() => {
+        if (gameState === 'correct') {
+            console.log('🔄 Дублирующий таймер - принудительный переход');
+            nextCard();
+        }
+    }, 3000);
 }
 
 // Обработка неправильного ответа
@@ -351,11 +363,24 @@ function handleIncorrectAnswer(userAnswer) {
         playCardAudio();
     }, 1000);
     
-    // Автоматически переходим к следующей карточке через 4 секунды
-    setTimeout(() => {
+    // Принудительный переход через 4 секунды
+    const transitionTimer = setTimeout(() => {
+        console.log('⏰ Таймер сработал - сбрасываем стили и переходим');
         resetButtonStyles();
         nextCard();
     }, 4000);
+    
+    // Сохраняем таймер
+    window.currentTransitionTimer = transitionTimer;
+    
+    // Дублирующий таймер на случай сбоя  
+    setTimeout(() => {
+        if (gameState === 'incorrect') {
+            console.log('🔄 Дублирующий таймер - принудительный переход');
+            resetButtonStyles();
+            nextCard();
+        }
+    }, 4500);
 }
 
 // Сброс стилей кнопок
@@ -368,7 +393,13 @@ function resetButtonStyles() {
 
 // Переход к следующей карточке
 function nextCard() {
-    console.log('🔄 Следующая карточка...');
+    console.log('🔄 Следующая карточка... Текущий индекс:', currentCardIndex);
+    
+    // Очищаем предыдущие таймеры если есть
+    if (window.currentTransitionTimer) {
+        clearTimeout(window.currentTransitionTimer);
+        window.currentTransitionTimer = null;
+    }
     
     // Останавливаем любое аудио
     if (window.speechSynthesis.speaking) {
@@ -377,10 +408,14 @@ function nextCard() {
     isAudioLoading = false;
     audioBtn.classList.remove('playing');
     
+    // Сбрасываем золотое сияние
+    goldenGlow.classList.remove('active');
+    
     // Анимация исчезновения
     gameCard.classList.add('slide-out');
     
     setTimeout(() => {
+        console.log('🎴 Переходим от карточки', currentCardIndex, 'к', currentCardIndex + 1);
         gameCard.classList.remove('slide-out');
         currentCardIndex++;
         resetButtonStyles();
@@ -592,6 +627,13 @@ function playErrorSound() {
         
         speechSynthesis.speak(utterance);
     }
+}
+
+// Принудительный переход к следующей карточке
+function forceNextCard() {
+    console.log('🚀 Принудительный переход к следующей карточке!');
+    gameState = 'waiting'; // Сбрасываем состояние
+    nextCard();
 }
 
 // Для Telegram Web App
