@@ -309,17 +309,17 @@ function handleCorrectAnswer() {
     }
     
     // Принудительный переход через 2.5 секунды  
-    const correctTransitionTimer = setTimeout(() => {
+    const transitionTimer = setTimeout(() => {
         console.log('⏰ Таймер сработал - переходим к следующей карточке');
         nextCard();
     }, 2500);
     
     // Сохраняем таймер для возможной очистки
-    window.currentTransitionTimer = correctTransitionTimer;
+    window.currentTransitionTimer = transitionTimer;
     return; // prevent any secondary timers from scheduling
     
     // Дублирующий таймер на случай сбоя
-    // setTimeout(() => {
+    setTimeout(() => {
         // if (false && gameState === 'correct') {
             console.log('🔄 Дублирующий таймер - принудительный переход');
             nextCard();
@@ -358,18 +358,18 @@ function handleIncorrectAnswer(userAnswer) {
     }, 1000);
     
     // Принудительный переход через 4 секунды
-    const correctTransitionTimer = setTimeout(() => {
+    const transitionTimer = setTimeout(() => {
         console.log('⏰ Таймер сработал - сбрасываем стили и переходим');
         resetButtonStyles();
         nextCard();
     }, 4000);
     
     // Сохраняем таймер
-    window.currentTransitionTimer = correctTransitionTimer;
+    window.currentTransitionTimer = transitionTimer;
     return; // prevent any secondary timers from scheduling
     
     // Дублирующий таймер на случай сбоя  
-    // setTimeout(() => {
+    setTimeout(() => {
         // if (false && gameState === 'incorrect') {
             console.log('🔄 Дублирующий таймер - принудительный переход');
             resetButtonStyles();
@@ -818,5 +818,3 @@ if (window.Telegram && window.Telegram.WebApp) {
     // Отключаем кнопку "Назад" в Telegram
     window.Telegram.WebApp.disableClosingConfirmation();
 }
-
-
