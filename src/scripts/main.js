@@ -318,7 +318,7 @@ function handleCorrectAnswer() {
     
     // Дублирующий таймер на случай сбоя
     setTimeout(() => {
-        if (gameState === 'correct') {
+        if (false && gameState === 'correct') {
             console.log('🔄 Дублирующий таймер - принудительный переход');
             nextCard();
         }
@@ -366,7 +366,7 @@ function handleIncorrectAnswer(userAnswer) {
     
     // Дублирующий таймер на случай сбоя  
     setTimeout(() => {
-        if (gameState === 'incorrect') {
+        if (false && gameState === 'incorrect') {
             console.log('🔄 Дублирующий таймер - принудительный переход');
             resetButtonStyles();
             nextCard();
