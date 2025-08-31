@@ -66,6 +66,35 @@
             </div>
         </div>
 
+        <!-- Экран завершения игры -->
+        <div class="game-complete-screen" id="gameCompleteScreen" style="display: none;">
+            <div class="completion-card">
+                <div class="completion-header">
+                    <div class="completion-icon">🏆</div>
+                    <h2 class="completion-title">Barakalla!</h2>
+                    <p class="completion-subtitle">O'yinni tugatdingiz!</p>
+                </div>
+                
+                <div class="score-summary">
+                    <div class="final-stars">
+                        <span id="finalStars">⭐⭐⭐⭐⭐</span>
+                    </div>
+                    <div class="score-text" id="scoreText">
+                        Siz <span id="totalQuestions">11</span> ta savoldan 
+                        <span id="correctAnswers">0</span> tasiga to'g'ri javob berdingiz!
+                    </div>
+                    <div class="percentage" id="percentage">0%</div>
+                </div>
+                
+                <div class="restart-section">
+                    <button class="restart-btn" id="restartBtn">
+                        <span class="restart-icon">🔄</span>
+                        Yana o'ynash
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Эффекты -->
         <div class="effects-container">
             <div class="confetti" id="confetti"></div>

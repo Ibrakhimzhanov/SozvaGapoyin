@@ -506,3 +506,199 @@ body {
         opacity: 0;
     }
 }
+
+/* Экран завершения игры */
+.game-complete-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.5s ease;
+}
+
+.game-complete-screen.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.completion-card {
+    background: white;
+    border-radius: 25px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    max-width: 90%;
+    width: 400px;
+    animation: bounceIn 0.6s ease-out;
+}
+
+.completion-header {
+    margin-bottom: 30px;
+}
+
+.completion-icon {
+    font-size: 80px;
+    margin-bottom: 15px;
+    animation: rotateIcon 2s ease-in-out infinite;
+}
+
+.completion-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #333;
+    margin: 10px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.completion-subtitle {
+    font-size: 20px;
+    color: #666;
+    margin: 0;
+}
+
+.score-summary {
+    margin: 30px 0;
+    padding: 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 20px;
+    color: white;
+}
+
+.final-stars {
+    font-size: 32px;
+    margin-bottom: 15px;
+    animation: sparkle 1.5s ease-in-out infinite;
+}
+
+.score-text {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 15px 0;
+    line-height: 1.4;
+}
+
+.score-text span {
+    font-weight: 800;
+    font-size: 20px;
+}
+
+.percentage {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.restart-section {
+    margin-top: 30px;
+}
+
+.restart-btn {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+.restart-btn:active {
+    transform: translateY(0);
+}
+
+.restart-icon {
+    font-size: 20px;
+}
+
+/* Анимации */
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes rotateIcon {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(-10deg) scale(1.1);
+    }
+    75% {
+        transform: rotate(10deg) scale(1.1);
+    }
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Мобильная адаптация */
+@media (max-width: 480px) {
+    .completion-card {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+    
+    .completion-icon {
+        font-size: 60px;
+    }
+    
+    .completion-title {
+        font-size: 28px;
+    }
+    
+    .completion-subtitle {
+        font-size: 16px;
+    }
+    
+    .score-text {
+        font-size: 16px;
+    }
+    
+    .percentage {
+        font-size: 24px;
+    }
+    
+    .restart-btn {
+        padding: 12px 25px;
+        font-size: 16px;
+    }
+}

@@ -85,7 +85,8 @@ const gameCards = [
 // Игровые переменные
 let currentCardIndex = 0;
 let score = 0;
-let gameState = 'waiting'; // waiting, answered, correct, incorrect
+let totalQuestions = 0;
+let gameState = 'waiting'; // waiting, answered, correct, incorrect, completed
 
 // Элементы DOM
 const cardImage = document.getElementById('cardImage');
@@ -97,6 +98,8 @@ const gameCard = document.getElementById('gameCard');
 const wordBtn = document.getElementById('wordBtn');
 const sentenceBtn = document.getElementById('sentenceBtn');
 const audioBtn = document.getElementById('audioBtn');
+const gameCompleteScreen = document.getElementById('gameCompleteScreen');
+const restartBtn = document.getElementById('restartBtn');
 
 // Аудио система
 let currentAudio = null;
@@ -108,6 +111,13 @@ function initGame() {
     shuffleArray(gameCards);
     currentCardIndex = 0;
     score = 0;
+    totalQuestions = gameCards.length;
+    gameState = 'waiting';
+    
+    // Скрываем экран завершения если он показан
+    gameCompleteScreen.style.display = 'none';
+    gameCompleteScreen.classList.remove('active');
+    
     updateScore();
     showCurrentCard();
 }
@@ -123,9 +133,9 @@ function shuffleArray(array) {
 // Показать текущую карточку
 function showCurrentCard() {
     if (currentCardIndex >= gameCards.length) {
-        // Игра завершена, начинаем заново
-        currentCardIndex = 0;
-        shuffleArray(gameCards);
+        // Игра завершена, показываем результат
+        showGameComplete();
+        return;
     }
 
     const currentCard = gameCards[currentCardIndex];
@@ -528,6 +538,13 @@ function preloadAudioFiles() {
     successAudio.onloadedmetadata = () => {
         console.log('✅ Предзагружено поздравление');
     };
+    
+    // Предзагружаем финальное сообщение
+    const finalAudio = new Audio('assets/audio/barakalla_message.mp3');
+    finalAudio.preload = 'metadata';
+    finalAudio.onloadedmetadata = () => {
+        console.log('✅ Предзагружено финальное сообщение');
+    };
 }
 
 // Добавляем обработчики событий
@@ -560,6 +577,13 @@ function addEventListeners() {
         console.log('📝 Выбор: GAP');
         event.stopPropagation();
         selectAnswer('sentence');
+    });
+    
+    // Обработчик для кнопки перезапуска
+    restartBtn.addEventListener('click', function(event) {
+        console.log('🔄 Перезапуск игры');
+        event.stopPropagation();
+        restartGame();
     });
 }
 
@@ -653,6 +677,101 @@ function playErrorSound() {
     console.log('⚠️ Мягкое уведомление об ошибке (без звука)');
     // Для детей используем только визуальную обратную связь
     // Аудиоповтор правильного ответа происходит в handleIncorrectAnswer()
+}
+
+// Показать экран завершения игры
+function showGameComplete() {
+    console.log('🏆 Игра завершена! Счет:', score, 'из', totalQuestions);
+    
+    gameState = 'completed';
+    
+    // Вычисляем процент правильных ответов
+    const percentage = Math.round((score / totalQuestions) * 100);
+    
+    // Останавливаем любое аудио
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+    
+    // Обновляем данные на экране завершения
+    document.getElementById('correctAnswers').textContent = score;
+    document.getElementById('totalQuestions').textContent = totalQuestions;
+    document.getElementById('percentage').textContent = percentage + '%';
+    
+    // Обновляем звездочки в зависимости от результата
+    const finalStars = document.getElementById('finalStars');
+    if (percentage >= 90) {
+        finalStars.textContent = '⭐⭐⭐⭐⭐';
+    } else if (percentage >= 70) {
+        finalStars.textContent = '⭐⭐⭐⭐';
+    } else if (percentage >= 50) {
+        finalStars.textContent = '⭐⭐⭐';
+    } else if (percentage >= 30) {
+        finalStars.textContent = '⭐⭐';
+    } else {
+        finalStars.textContent = '⭐';
+    }
+    
+    // Показываем экран завершения
+    gameCompleteScreen.style.display = 'flex';
+    
+    setTimeout(() => {
+        gameCompleteScreen.classList.add('active');
+        
+        // Воспроизводим финальное сообщение
+        setTimeout(() => {
+            playFinalMessage();
+        }, 800);
+    }, 100);
+}
+
+// Воспроизвести финальное сообщение
+function playFinalMessage() {
+    console.log('🎉 Воспроизведение финального сообщения');
+    
+    try {
+        const finalAudio = new Audio('assets/audio/barakalla_message.mp3');
+        finalAudio.volume = 0.9;
+        
+        finalAudio.onplay = () => {
+            console.log('🎊 Финальное сообщение воспроизводится');
+        };
+        
+        finalAudio.onerror = (error) => {
+            console.log('❌ Ошибка воспроизведения финального сообщения:', error);
+        };
+        
+        const playPromise = finalAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('✅ Финальное сообщение успешно воспроизведено');
+                })
+                .catch(error => {
+                    console.log('⚠️ Не удалось воспроизвести финальное сообщение:', error);
+                });
+        }
+        
+    } catch (error) {
+        console.log('❌ Критическая ошибка воспроизведения финального сообщения:', error);
+    }
+}
+
+// Перезапуск игры
+function restartGame() {
+    console.log('🚀 Перезапуск игры');
+    
+    // Скрываем экран завершения
+    gameCompleteScreen.classList.remove('active');
+    
+    setTimeout(() => {
+        gameCompleteScreen.style.display = 'none';
+        
+        // Перезапускаем игру
+        initGame();
+    }, 500);
 }
 
 // Принудительный переход к следующей карточке
