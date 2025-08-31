@@ -694,6 +694,9 @@ function showGameComplete() {
         currentAudio.currentTime = 0;
     }
     
+    // Отправляем результат в Telegram если доступно
+    sendResultToTelegram(score, totalQuestions, percentage);
+    
     // Обновляем данные на экране завершения
     document.getElementById('correctAnswers').textContent = score;
     document.getElementById('totalQuestions').textContent = totalQuestions;
@@ -779,6 +782,33 @@ function forceNextCard() {
     console.log('🚀 Принудительный переход к следующей карточке!');
     gameState = 'waiting'; // Сбрасываем состояние
     nextCard();
+}
+
+// Отправка результата в чат Telegram
+function sendResultToTelegram(score, totalQuestions, percentage) {
+    console.log('📱 Отправка результатов в Telegram:', { score, totalQuestions, percentage });
+    
+    if (window.Telegram && window.Telegram.WebApp) {
+        try {
+            // Создаем красивое сообщение результата
+            const resultMessage = {
+                score: score,
+                totalQuestions: totalQuestions,
+                percentage: percentage,
+                timestamp: new Date().toISOString(),
+                message: `Barakalla! Siz ${totalQuestions} ta savoldan ${score} tasiga to'g'ri javob berdingiz! (${percentage}%)`
+            };
+            
+            const resultData = JSON.stringify(resultMessage);
+            window.Telegram.WebApp.sendData(resultData);
+            
+            console.log('✅ Результат отправлен в Telegram чат');
+        } catch (error) {
+            console.log('❌ Ошибка отправки результата в Telegram:', error);
+        }
+    } else {
+        console.log('⚠️ Telegram Web App не доступен');
+    }
 }
 
 // Для Telegram Web App
