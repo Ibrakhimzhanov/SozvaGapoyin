@@ -97,9 +97,9 @@ function shuffleArray(array) {
 // Показать текущую карточку
 function showCurrentCard() {
     if (currentCardIndex >= gameCards.length) {
-        // Игра завершена, начинаем заново
-        currentCardIndex = 0;
-        shuffleArray(gameCards);
+        // Игра завершена, отправляем результат и закрываем приложение
+        sendResultToTelegram();
+        return;
     }
 
     const currentCard = gameCards[currentCardIndex];
@@ -226,12 +226,25 @@ function nextCard() {
 // Обновление счета
 function updateScore() {
     scoreElement.textContent = score;
-    
+
     // Анимация увеличения счета
     scoreElement.style.transform = 'scale(1.3)';
     setTimeout(() => {
         scoreElement.style.transform = 'scale(1)';
     }, 300);
+}
+
+// Отправка результата в чат Telegram
+function sendResultToTelegram() {
+    if (window.Telegram && window.Telegram.WebApp) {
+        const resultData = JSON.stringify({ score });
+        window.Telegram.WebApp.sendData(resultData);
+        window.Telegram.WebApp.showAlert(`Ваш результат: ${score}`, () => {
+            window.Telegram.WebApp.close();
+        });
+    } else {
+        alert(`Ваш результат: ${score}`);
+    }
 }
 
 // Показать конфетти
