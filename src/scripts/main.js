@@ -129,6 +129,7 @@ function showCurrentCard() {
     }
 
     const currentCard = gameCards[currentCardIndex];
+    console.log('🎴 Карточка:', currentCard.uzbekText, '(тип:', currentCard.type + ')');
     
     // Анимация появления новой карточки
     gameCard.classList.add('slide-in');
@@ -148,10 +149,11 @@ function showCurrentCard() {
     sentenceBtn.style.opacity = '1';
     
     // Останавливаем предыдущее аудио
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
+    if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
     }
+    isAudioLoading = false;
+    audioBtn.classList.remove('playing');
     
     // Убираем анимацию через время
     setTimeout(() => {
@@ -265,10 +267,16 @@ function playCardAudio() {
 
 // Обработка выбора ответа
 function selectAnswer(userAnswer) {
-    if (gameState !== 'waiting') return;
+    console.log('Выбран ответ:', userAnswer, 'Состояние игры:', gameState);
+    
+    if (gameState !== 'waiting') {
+        console.log('Игра не в состоянии ожидания, игнорируем клик');
+        return;
+    }
     
     const currentCard = gameCards[currentCardIndex];
     const isCorrect = userAnswer === currentCard.correctAnswer;
+    console.log('Ответ правильный:', isCorrect);
     
     gameState = isCorrect ? 'correct' : 'incorrect';
     
@@ -285,6 +293,8 @@ function selectAnswer(userAnswer) {
 
 // Обработка правильного ответа
 function handleCorrectAnswer() {
+    console.log('✅ Правильный ответ! Переход через 2.5 сек');
+    
     // Увеличиваем счет
     score++;
     updateScore();
@@ -314,6 +324,8 @@ function handleCorrectAnswer() {
 
 // Обработка неправильного ответа
 function handleIncorrectAnswer(userAnswer) {
+    console.log('❌ Неправильный ответ. Повтор + переход через 4 сек');
+    
     // Показываем правильный ответ визуально
     const correctBtn = gameCards[currentCardIndex].correctAnswer === 'word' ? wordBtn : sentenceBtn;
     const wrongBtn = userAnswer === 'word' ? wordBtn : sentenceBtn;
@@ -356,7 +368,7 @@ function resetButtonStyles() {
 
 // Переход к следующей карточке
 function nextCard() {
-    console.log('Переход к следующей карточке');
+    console.log('🔄 Следующая карточка...');
     
     // Останавливаем любое аудио
     if (window.speechSynthesis.speaking) {
@@ -493,18 +505,32 @@ function initVoices() {
 function addEventListeners() {
     // Обработчик клика на карточку
     gameCard.addEventListener('click', function(event) {
-        console.log('Клик на карточку');
-        // Если клик был не по кнопке аудио
-        if (!event.target.closest('.audio-btn')) {
+        // Если клик был не по кнопке аудио и не по кнопкам ответов
+        if (!event.target.closest('.audio-btn') && !event.target.closest('.answer-btn')) {
+            console.log('🎵 Клик на карточку - воспроизведение');
             playCardAudio();
         }
     });
     
     // Обработчик клика на кнопку аудио
     audioBtn.addEventListener('click', function(event) {
-        console.log('Клик на кнопку аудио');
-        event.stopPropagation(); // Останавливаем всплытие события
+        console.log('🔊 Кнопка аудио');
+        event.stopPropagation();
         playCardAudio();
+    });
+    
+    // Обработчик клика на кнопку SO'Z
+    wordBtn.addEventListener('click', function(event) {
+        console.log('📝 Выбор: SO\'Z');
+        event.stopPropagation();
+        selectAnswer('word');
+    });
+    
+    // Обработчик клика на кнопку GAP
+    sentenceBtn.addEventListener('click', function(event) {
+        console.log('📝 Выбор: GAP');
+        event.stopPropagation();
+        selectAnswer('sentence');
     });
 }
 
